@@ -467,7 +467,7 @@ class GenerateLaravel5MigrationWizardPreviewPage(WizardPage):
         self.save_button = mforms.newButton()
         self.save_button.enable_internal_padding(True)
         self.save_button.set_text('Save Migration(s) to Folder...')
-        self.save_button.set_tooltip('Select the folder to save your migration(s) to.')
+        self.save_button.set_tooltip('Select the folder to save your migration(s) to. Choose any file in directory, it will use its containing directory.')
         self.save_button.add_clicked_callback(self.save_clicked)
 
         self.sql_text = mforms.newCodeEditor()
@@ -487,10 +487,11 @@ class GenerateLaravel5MigrationWizardPreviewPage(WizardPage):
         self.content.add_end(self.sql_text, True, True)
 
     def save_clicked(self):
-        file_chooser = mforms.newFileChooser(self.main, mforms.OpenDirectory)
+        file_chooser = mforms.newFileChooser(self.main, mforms.OpenFile)
+        file_chooser.add_selector_option('name','label','options|*.*')
 
         if file_chooser.run_modal() == mforms.ResultOk:
-            path = file_chooser.get_path()
+            path = file_chooser.get_directory()
 
             i = len(glob.glob(path + "/*_table.php"))
             now = datetime.datetime.now()
@@ -523,6 +524,11 @@ class GenerateLaravel5MigrationWizardPreviewPage(WizardPage):
                         'Could not save to file "%s": %s' % (path, str(e)),
                         'OK', '', ''
                     )
+            mforms.Utilities.show_message(
+                'Migration Files processed!',
+                'The process to save migrations file has ended, you can click "Finish" button',
+                'OK', '', ''
+            )
 
 
 class GenerateLaravel5MigrationWizard(WizardForm):
